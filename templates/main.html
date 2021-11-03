@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <title>식당리스트페이지</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gamja+Flower&family=Jua&family=Nanum+Gothic+Coding&family=Noto+Sans+KR&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /*헤더*/
+        .navbar-brand logo {
+            font-weight: bold;
+            font-size: 3em;
+            margin: 30px auto 0px auto;
+        }
+
+        .userInfo {
+            float: right;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .logoutButton {
+            font-weight: bold;
+        }
+
+        .titleBox {
+            width: 80%;
+            border: 5px solid #85AF4B;
+            border-radius: 30px;
+            vertical-align: middle;
+            margin: 100px auto;
+            padding: 40px 0px;
+        }
+
+        .titleText {
+            text-align: center;
+        }
+
+        .titleText01 {
+            font-size: 2em;
+        }
+
+        .titleText02 {
+            font-size: 3em;
+        }
+
+        .titleText03 {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .contentBox {
+            width: 80%;
+            margin: 50px auto 50px auto;
+            display: block;
+        }
+
+
+        .restInfo > h3 {
+            font-size: 60px;
+            font-weight: bold;
+        }
+
+        .restInfo > span {
+            font-size: 30px;
+            margin-top: 20px;
+        }
+
+        .restInfo > p {
+            font-size: 20px;
+            margin-top: 30px;
+        }
+
+        .restInfo > a {
+            float: right;
+            text-decoration: none;
+            color: #85AF4B;
+        }
+
+        .search-box {
+            margin: auto;
+            width: 50%;
+            margin-bottom: 100px;
+        }
+
+    </style>
+    <script>
+        function Searching() {
+
+            let search = $("#keyword").val();
+            $.ajax({
+                type: "GET",
+                url: "/search",
+                data: {search_give: search},
+                success: function (response) {
+                    let rest_list = response['rest_lists']
+                    for (let i = 0; i < rest_list.length; i++) {
+                        let rest_name = rest_list[i]['rest_name']
+                        let rest_tag = rest_list[i]['rest_tag']
+                        let call = rest_list[i]['callNum']
+                        let image = rest_list[i]['image']
+                        let address = rest_list[i]['address']
+                        let star = rest_list[i]['star']
+                        let rest_url = rest_list[i]['rest_url']
+
+                        let temp_html = ` <div class="card">
+                                                    <img id="img-name" class="card-img-top"
+                                                         src=${image}
+                                                         alt="Card image cap">
+                                                    <div class="card-body">
+                                                        <a target="_blank" href="${rest_url}" class="card-title" style="font-size: x-large">${rest_name}</a>
+                                                        <p class="card-text star">별점 : ${star}</p>
+                                                        <p class="card-text"> 주소 : ${address}</p>
+                                                        <p class="card-text"> 전화번호 : ${call}</p>
+                                                        <button id="btn-open-popup"class="btn btn-primary" onclick="window.location='/detailView'">${rest_name} 더보기 ></button>
+                                                    </div>
+                                               </div>`
+                        $('#contentBox').append(temp_html);
+                    }
+                }
+            })
+        }
+
+        function to_logout() {
+            $.removeCookie('my_token', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/login"
+            }
+
+
+        function to_login() {
+            window.location.href = '/login'
+        }
+    </script>
+</head>
+<body>
+
+<header>
+    <nav class="navbar   justify-content-between header">
+        <a class="navbar-brand logo" style="color: #85AF4B" href="/main">채식의 광장</a>
+    </nav>
+    {% if user_info %}
+        <form class="form-inline userInfo">
+            <span class="mr-4"> {{ user_info.username }} |</span>
+            <button onclick="to_logout()" class="btn btn-outline-success my-2 my-sm-4 mr-4 logoutButton" type="button">
+                로그아웃
+            </button>
+        </form>
+
+    {% else %}
+        <form class="form-inline userInfo">
+            <button onclick="to_login()" class="btn btn-outline-success my-2 my-sm-4 mr-4 logoutButton" type="button">
+                로그인
+            </button>
+        </form>
+    {% endif %}
+</header>
+<section>
+    <div class="titleBox">
+        <p class="titleText titleText01">채식의 광장 가이드</p>
+        <p class="titleText titleText02">식당을 다녀온 채식이들이 선정한</p>
+        <p class="titleText titleText03">강남구 채식 베스트 </p>
+    </div>
+    <!-- Search bar -->
+    <div class="search-box d-flex justify-content-center">
+        <input id="keyword" type="text" placeholder="구 이름을입력해주세요" class="form-control" style="margin-right: 0.5rem ">
+        <button class="btn btn-light" id="search" type="submit" onclick="Searching()">검색</button>
+    </div>
+    <!--list -->
+    <div id="contentBox" class="contentBox">
+    </div>
+
+
+</section>
+
+</body>
+</html>
+
