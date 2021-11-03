@@ -17,7 +17,7 @@ db = client.dbhomework
 
 app = Flask(__name__)
 
-SECRET_KEY = 'vegan'
+SECRET_KEY = 'sparta'
 
 
 # 시작 페이지. 사용자 토큰을 확인 후 login 페이지나 list 페이지로 보내줍니다.
