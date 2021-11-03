@@ -22,7 +22,7 @@ SECRET_KEY = 'vegan'
 
 # 시작 페이지. 사용자 토큰을 확인 후 login 페이지나 list 페이지로 보내줍니다.
 @app.route('/')
-def main():
+def home():
     token_receive = request.cookies.get('token')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
@@ -39,12 +39,12 @@ def main():
 
 @app.route('/login')
 def login():
-    return render_template("index.html")
+    return render_template("login.html")
 
 
 @app.route('/join')
 def join():
-    return render_template("join.html")
+    return render_template("login.html")
 
 
 @app.route('/logout')
@@ -53,8 +53,8 @@ def logout():
     return render_template("login.html")
 
 
-@app.route('/list')
-def list():
+@app.route('/main')
+def main():
     # 식당리스트 페이지
     return render_template("list.html")
 
