@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
@@ -126,6 +126,12 @@
                         let address = rest_list[i]['address']
                         let star = rest_list[i]['star']
                         let rest_url = rest_list[i]['rest_url']
+                        $.cookie('name', rest_name, {expires: 1})
+                        $.cookie('tag', rest_tag, {expires: 1})
+                        $.cookie('call', call, {expires: 1})
+                        $.cookie('image', image, {expires: 1})
+                        $.cookie('address', address, {expires: 1})
+                        $.cookie('star', star, {expires: 1})
 
                         let temp_html = ` <div class="card">
                                                     <img id="img-name" class="card-img-top"
@@ -136,22 +142,36 @@
                                                         <p class="card-text star">별점 : ${star}</p>
                                                         <p class="card-text"> 주소 : ${address}</p>
                                                         <p class="card-text"> 전화번호 : ${call}</p>
-                                                        <button id="btn-open-popup"class="btn btn-primary" onclick="window.location='/detailView'">${rest_name} 더보기 ></button>
+                                                        <button id="btn-open-popup"class="btn btn-primary" onclick="detailPage()">${rest_name} 더보기</button>
                                                     </div>
                                                </div>`
                         $('#contentBox').append(temp_html);
+
+
                     }
                 }
             })
         }
 
+        //상세페이지 이동
+        function detailPage() {
+            window.location.href = "/detailView?name=" + $.cookie('name') + "&tag="
+                                    + $.cookie('tag') + "&call=" + $.cookie('call')
+                                    + "&address=" + $.cookie('address')
+                                    + "&star=" + $.cookie('star')
+        }
+
+
+
+
+        //로그아웃
         function to_logout() {
             $.removeCookie('my_token', {path: '/'});
-            alert('로그아웃!')
+            alert('로그아웃 합니다!!')
             window.location.href = "/login"
-            }
+        }
 
-
+        //로그인
         function to_login() {
             window.location.href = '/login'
         }
@@ -165,7 +185,7 @@
     </nav>
     {% if user_info %}
         <form class="form-inline userInfo">
-            <span class="mr-4"> {{ user_info.username }} |</span>
+            <span class="mr-4"> {{ user_info.nickname }} |</span>
             <button onclick="to_logout()" class="btn btn-outline-success my-2 my-sm-4 mr-4 logoutButton" type="button">
                 로그아웃
             </button>
@@ -183,7 +203,7 @@
     <div class="titleBox">
         <p class="titleText titleText01">채식의 광장 가이드</p>
         <p class="titleText titleText02">식당을 다녀온 채식이들이 선정한</p>
-        <p class="titleText titleText03">강남구 채식 베스트 </p>
+        <p class="titleText titleText03"> 채식 식당 베스트 </p>
     </div>
     <!-- Search bar -->
     <div class="search-box d-flex justify-content-center">
