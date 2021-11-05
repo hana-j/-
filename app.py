@@ -1,28 +1,27 @@
-from urllib import parse
-# pyJWT 패키지 설정
-import jwt
 import datetime
 import hashlib
+from datetime import datetime, timedelta
+from urllib import parse
+
+# pyJWT 패키지 설정
+import jwt
 import requests
 from bs4 import BeautifulSoup
+from bson import ObjectId
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from selenium import webdriver
-from werkzeug.utils import secure_filename
-from datetime import datetime, timedelta
-from selenium.common.exceptions import NoSuchElementException
 # db 연결
 from pymongo import MongoClient
+from selenium import webdriver
+
+client = MongoClient('52.79.236.197', 27017, username="test", password="test")
+# client = MongoClient('mongodb://test:test@localhost', 27017)
+db = client.miniproject
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
 
 SECRET_KEY = 'SPARTA'
-
-# 서버연결된 db
-# client = MongoClient('mongodb://test:test@localhost', 27017)
-client = MongoClient('localhost', 27017)
-db = client.mini1
 
 
 # 시작 페이지. 사용자 토큰을 확인 후 login 페이지나 list 페이지로 보내줍니다.
@@ -87,8 +86,9 @@ def sign_in():
     if result is not None:
         payload = {
             'id': username_receive,
-            'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
+            'exp': (datetime.utcnow() + timedelta(seconds=60 * 60 * 24))  # 로그인 24시간 유지
         }
+
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         return jsonify({'result': 'success', 'token': token})
@@ -97,62 +97,10 @@ def sign_in():
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
 
-@app.route('/logout')
-def logout():
-    # 로그아웃은 따로 열리는 html페이지 없이 바로 로그인 페이지 연결
-    return render_template("login.html")
-
-
 @app.route('/main')
 def main():
     # 식당리스트 페이지
     return render_template("main.html")
-
-
-@app.route('/detailView')
-def detail():
-    return render_template("detailView.html")
-
-
-# 리뷰 작성
-# @app.route('/writeReview', method=['POST'])
-# def writeReview():
-#     token_receive = request.cookies.get('token')
-#     try:
-#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-#         user_info = db.users.find_one({"user_id": payload["id"]})
-#         comment_receive = request.form["comment_give"]
-#         date_receive = request.form["date_give"]
-#         doc = {
-#             "user_id": user_info["user_id"],
-#             "comment": comment_receive,
-#             "date": date_receive
-#         }
-#         db.review.insert_one(doc)
-#         return jsonify({"result": "success", 'msg': '포스팅 성공'})
-#     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-#         return render_template("detailView.html")
-#
-#
-# # 리뷰 리스트 가져오기 (최근 10개)
-# @app.route("/get_review", methods=['GET'])
-# def get_review():
-#     token_receive = request.cookies.get('mytoken')
-#     try:
-#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-#         # 최근등록 리뷰 10개까지
-#         posts = list(db.review.find({}).sort("date", -1).limit(10))
-#         for post in posts:
-#             post["_id"] = str(post["_id"])
-#         return jsonify({"result": " success", "msg": "리뷰를 로드 완료했습니다", "posts": post})
-#     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-#         return render_template("detailView.html")
-#
-
-@app.route('/vegan/delReview')
-def delReview():
-    # 리뷰작성페이지에서 본인이 작성한 리뷰 삭제시 상세페이지로 이동
-    return render_template("detailView.html")
 
 
 # 네이버 크롤링 ----------------------------------------------------
@@ -189,7 +137,11 @@ def keyword():
         print(rest_name, rest_tag, call, rest_url)
 
         # 이미지,주소 크롤링의 경우 다른 곳에 있어서 2차 크롤링 시작(주소인 newUrlImg 참고)
-        driver = webdriver.Chrome('./chromedriver')
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
         newUrlImg = urlImg + parse.quote(search + " " + rest_name)
         print(newUrlImg)
         driver.get(newUrlImg)
@@ -247,6 +199,88 @@ def keyword():
         rest_list.append(data)
 
     return jsonify({'rest_lists': rest_list})
+
+
+# 상세페이지 열기
+@app.route('/detailView')
+def detail():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+        return render_template('detailView.html', user_info=user_info)
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+
+
+# 리뷰작성
+@app.route('/posting', methods=['POST'])
+def posting():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+        rest = request.form['rest']
+        comment = request.form['comment']
+        date = request.form['date']
+        doc = {
+            "rest": rest,
+            "username": user_info["username"],
+            "comment": comment,
+            "date": date
+        }
+        db.review.insert_one(doc)
+        return jsonify({"result": "success", "msg": "리뷰작성완료"})
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+
+
+# 리뷰 리스트 가져오기
+@app.route("/get_posts", methods=['GET'])
+def get_posts():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        # 최근등록 리뷰 10개까지
+        posts = list(db.review.find({}).sort("date", -1).limit(10))
+        for post in posts:
+            post["_id"] = str(post["_id"])
+        return jsonify({"result": "success", "msg": "리뷰를 로드 완료했습니다", "posts": posts})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("detailView"))
+
+
+# 리뷰 삭제
+@app.route("/post/<post_id>", methods=['DELETE'])
+def delete_post(post_id):
+    token_receive = request.cookies.get('mytoken')
+    """Initialize a new ObjectId.
+    An ObjectId is a 12-byte unique identifier consisting of
+    """
+    post = db.review.find_one({'_id': ObjectId(post_id)}, {'_id': False})
+    username = post['username']
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        if post['username'] == payload['id']:
+            db.review.delete_one({'_id': ObjectId(post_id)})
+            return jsonify({
+                'result': 'success',
+                'msg': '삭제되었습니다.',
+                'username': username
+            }), 200
+        else:
+            return jsonify({
+                'result': 'failure',
+                'msg': '본인의 포스팅만 삭제가 가능합니다.'
+            }), 403
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
 
 if __name__ == '__main__':

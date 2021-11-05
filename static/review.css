@@ -1,0 +1,157 @@
+
+* {
+    font-family: 'Stylish', sans-serif;
+}
+body {
+    min-height: 100vh;
+    padding-top: 5rem;
+}
+/*해더부분*/
+
+.navbar-brand{
+    display: inline-block;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 5em;
+    margin:auto;
+    cursor:pointer;
+    color: #85AF4B;
+}
+.userInfo{
+    display: inline-block;
+    float: right;
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+
+.logoutButton {
+    font-weight: bold;
+}
+
+.contentBox > img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+}
+
+.contentBox > p {
+    font-size: 30px;
+}
+
+/* -- 컨텐츠 restInfo 부분 --*/
+#img-name {
+    width: 18.750em;
+    height: 18.750em;
+    object-fit: cover;
+}
+
+.restName {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.restStar, .restCall {
+    margin-top: 0.4em;
+    font-size: 1em;
+}
+
+.restStar > span {
+    color: #85AF4B;
+    font-weight: bold;
+}
+
+.restAddress {
+    height: 4em;
+    font-size: 1em;
+}
+
+.detailView {
+    float: right;
+}
+
+/*=============================*/
+.restInfoWrap {
+    width: 50%;
+    margin: 5em auto 0em auto;
+}
+.restInfoWrap > p {
+    font-weight: bold;
+}
+.restInfoWrap > h1 > span {
+    color: #85AF4B;
+    font-weight: bold;
+}
+
+.restReview {
+    width: 1200px;
+    height: 200px;
+    margin: auto;
+}
+
+.restReview > div:nth-child(1) {
+    width: 1200px;
+    display: inline-block;
+}
+
+.restReview > div:nth-child(1) > p {
+    font-size: 30px;
+    float: left;
+}
+
+.restReview > div:nth-child(1) > button {
+    float: right;
+}
+
+.restReview > div:nth-child(2) > p {
+    margin: 30px auto 0px auto;
+    width: 1000px;
+}
+
+.restReviewList {
+    width: 1200px;
+    height: 600px;
+    margin: auto;
+}
+
+
+
+
+.section {
+    padding: 1rem 1.5rem;
+    max-width: 750px;
+    margin: auto;
+}
+
+.is-sparta {
+    color: #0A6E0A !important;
+}
+
+.button.is-sparta {
+    background-color: #85AF4B;
+    border-color: transparent;
+    color: #fff !important;
+}
+
+.button.is-sparta.is-outlined {
+    background-color: transparent;
+    border-color: #85AF4B;
+    color: #85AF4B !important;
+}
+
+.modal-content {
+    width: 600px;
+    max-width: 80%;
+}
+
+input::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+.image img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}

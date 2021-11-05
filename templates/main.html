@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- CSS -->
+    <link href="/static/main.css" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gamja+Flower&family=Jua&family=Nanum+Gothic+Coding&family=Noto+Sans+KR&display=swap"
+          rel="stylesheet">
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -19,96 +26,11 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
     <title>식당리스트페이지</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gamja+Flower&family=Jua&family=Nanum+Gothic+Coding&family=Noto+Sans+KR&display=swap"
-          rel="stylesheet">
-
-    <style>
-        * {
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-
-        /*헤더*/
-        .navbar-brand logo {
-            font-weight: bold;
-            font-size: 3em;
-            margin: 30px auto 0px auto;
-        }
-
-        .userInfo {
-            float: right;
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-
-        .logoutButton {
-            font-weight: bold;
-        }
-
-        .titleBox {
-            width: 80%;
-            border: 5px solid #85AF4B;
-            border-radius: 30px;
-            vertical-align: middle;
-            margin: 100px auto;
-            padding: 40px 0px;
-        }
-
-        .titleText {
-            text-align: center;
-        }
-
-        .titleText01 {
-            font-size: 2em;
-        }
-
-        .titleText02 {
-            font-size: 3em;
-        }
-
-        .titleText03 {
-            font-size: 3em;
-            font-weight: bold;
-        }
-
-        .contentBox {
-            width: 80%;
-            margin: 50px auto 50px auto;
-            display: block;
-        }
-
-
-        .restInfo > h3 {
-            font-size: 60px;
-            font-weight: bold;
-        }
-
-        .restInfo > span {
-            font-size: 30px;
-            margin-top: 20px;
-        }
-
-        .restInfo > p {
-            font-size: 20px;
-            margin-top: 30px;
-        }
-
-        .restInfo > a {
-            float: right;
-            text-decoration: none;
-            color: #85AF4B;
-        }
-
-        .search-box {
-            margin: auto;
-            width: 50%;
-            margin-bottom: 100px;
-        }
-
-    </style>
     <script>
+        $(document).ready(function(){
+
+        })
+        // 식당정보 크롤링
         function Searching() {
 
             let search = $("#keyword").val();
@@ -127,31 +49,60 @@
                         let star = rest_list[i]['star']
                         let rest_url = rest_list[i]['rest_url']
 
-                        let temp_html = ` <div class="card">
-                                                    <img id="img-name" class="card-img-top"
-                                                         src=${image}
-                                                         alt="Card image cap">
-                                                    <div class="card-body">
-                                                        <a target="_blank" href="${rest_url}" class="card-title" style="font-size: x-large">${rest_name}</a>
-                                                        <p class="card-text star">별점 : ${star}</p>
-                                                        <p class="card-text"> 주소 : ${address}</p>
-                                                        <p class="card-text"> 전화번호 : ${call}</p>
-                                                        <button id="btn-open-popup"class="btn btn-primary" onclick="window.location='/detailView'">${rest_name} 더보기 ></button>
-                                                    </div>
-                                               </div>`
-                        $('#contentBox').append(temp_html);
+                        // tempHTML
+                        let temp_html = `
+<div id="contentBox" class="contentBox">
+        <div class="card restCard">
+            <div class="restCardWrap">
+            <img id="img-name" class="card-img-top"
+                 src=${image}
+                 alt="Card image cap">
+            <div class="card-body restInfoCard">
+                <a target="_blank" href="${rest_url}" class="card-title restName">${rest_name}</a>
+                <p class="card-text star restStar">별점 : <span>${star}</span></p>
+                <p class="card-text restCall"> 전화번호 : ${call}</p>
+                <p class="card-text restAddress"> 주소 : ${address}</p>
+                <button id="btn-open-popup" class="btn btn-primary detailView"
+                    onclick="detailPage('${rest_name},${rest_tag},${call},${image}, ${address},${star}')">${rest_name} 더보기</button>
+            </div>
+        </div>
+</div>
+`
+                        $('#contentWrap').append(temp_html);
+
                     }
+
                 }
             })
         }
 
+        //상세페이지 이동
+        function detailPage(rest, tag, call, image, address, star) {
+            let date = new Date()
+            date.setTime(date.getTime() + 20 * 60 * 1000) // 20분
+                        $.cookie('rest',rest,{expires : date})
+                        {#$.cookie('tag',tag,{expires : date})#}
+                        {#$.cookie('call',call,{expires : date})#}
+                        {#$.cookie('image',image,{expires : date})#}
+                        {#$.cookie('address',address,{expires : date})#}
+                        {#$.cookie('star',star,{expires : date})#}
+            window.location.href = "/detailView?info="+ $.cookie('rest')
+                {#+"&tag="+$.cookie('tag')#}
+                {#+"&call="+ $.cookie('call')#}
+                {#+"&image="+ $.cookie('image')#}
+                {#+"&address="+ $.cookie('address')#}
+                {#+"&star="+ $.cookie('star')#}
+        }
+
+
+        //로그아웃
         function to_logout() {
             $.removeCookie('my_token', {path: '/'});
-            alert('로그아웃!')
+            alert('로그아웃 합니다!!')
             window.location.href = "/login"
-            }
+        }
 
-
+        //로그인
         function to_login() {
             window.location.href = '/login'
         }
@@ -160,30 +111,44 @@
 <body>
 
 <header>
-    <nav class="navbar   justify-content-between header">
-        <a class="navbar-brand logo" style="color: #85AF4B" href="/main">채식의 광장</a>
-    </nav>
-    {% if user_info %}
-        <form class="form-inline userInfo">
-            <span class="mr-4"> {{ user_info.username }} |</span>
-            <button onclick="to_logout()" class="btn btn-outline-success my-2 my-sm-4 mr-4 logoutButton" type="button">
-                로그아웃
-            </button>
-        </form>
+    <!-- Logo -->
+    <nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="">
+                <strong class="logo"
+                        style="font-family: 'Stylish', sans-serif;font-size: larger;">채식의 광장</strong>
+            </a>
+        </div>
+        <div class="login-info">
+            {% if user_info %}
+                <form class="form-inline userInfo">
+                    <span class="mr-4"> {{ user_info.nickname }} 🥦 |</span>
+                    <button onclick="to_logout()" class="btn btn-outline-success my-2 my-sm-4 mr-4 logoutButton"
+                            type="button">
+                        로그아웃
+                    </button>
+                </form>
 
-    {% else %}
-        <form class="form-inline userInfo">
-            <button onclick="to_login()" class="btn btn-outline-success my-2 my-sm-4 mr-4 logoutButton" type="button">
-                로그인
-            </button>
-        </form>
-    {% endif %}
+            {% else %}
+                <form class="form-inline userInfo">
+                    <button onclick="to_login()" class="btn btn-outline-success my-2 my-sm-4 mr-4 logoutButton"
+                            type="button">
+                        로그인
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+
+    </nav>
+
 </header>
 <section>
+    <!-- Title box -->
     <div class="titleBox">
         <p class="titleText titleText01">채식의 광장 가이드</p>
         <p class="titleText titleText02">식당을 다녀온 채식이들이 선정한</p>
-        <p class="titleText titleText03">강남구 채식 베스트 </p>
+        <p class="titleText titleText03">베스트 식당</p>
     </div>
     <!-- Search bar -->
     <div class="search-box d-flex justify-content-center">
@@ -191,12 +156,51 @@
         <button class="btn btn-light" id="search" type="submit" onclick="Searching()">검색</button>
     </div>
     <!--list -->
-    <div id="contentBox" class="contentBox">
+    <div id="contentWrap" class="contentWrap">
+        <!-- 테스트코드 -->
+        <div id="contentBox" class="contentBox">
+            <div class="card restCard">
+                <div class="restCardWrap">
+                    <img id="img-name" class="card-img-top"
+                         src="https://cdn.imweb.me/upload/S201807105b444eb1364b5/f6ea0d46cb7c2.jpg"
+                         alt="Card image cap">
+                    <div class="card-body restInfoCard">
+                        <a target="_blank" href="${rest_url}" class="card-title restName">샐러드뱅크</a>
+                        <p class="card-text star restStar">별점 : <span>5.0</span></p>
+                        <p class="card-text restCall"> 전화번호 : 070-1588-1588</p>
+                        <p class="card-text restAddress"> 주소 : 서울특별시 강남구 압구정로2길 45 1-1층지번서울특별시 강남구 신사동 517-5 1-1층서울특별시
+                            강남구 압구정로2길 45 1-1층지번서울특별시 강남구 신사동 517-5 1-1층</p>
+                        <button id="btn-open-popup" class="btn btn-primary detailView" onclick="detailPage()">
+                            샐러드뱅크
+                            더보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+        <div id="contentBox" class="contentBox">
+            <div class="card restCard">
+                <div class="restCardWrap">
+                    <img id="img-name" class="card-img-top"
+                         src="https://cdn.imweb.me/upload/S201807105b444eb1364b5/f6ea0d46cb7c2.jpg"
+                         alt="Card image cap">
+                    <div class="card-body restInfoCard">
+                        <a target="_blank" href="${rest_url}" class="card-title restName">샐러드뱅크</a>
+                        <p class="card-text star restStar">별점 : <span>5.0</span></p>
+                        <p class="card-text restCall"> 전화번호 : 070-1588-1588</p>
+                        <p class="card-text restAddress"> 주소 : 서울특별시 강남구 압구정로2길 45 1-1층지번서울특별시 강남구 신사동 517-5 1-1층서울특별시
+                            강남구 압구정로2길 45 1-1층지번서울특별시 강남구 신사동 517-5 1-1층</p>
+                        <button id="btn-open-popup" class="btn btn-primary detailView" onclick="detailPage()">
+                            샐러드뱅크
+                            더보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
     </div>
-
-
 </section>
-
 </body>
 </html>
-
