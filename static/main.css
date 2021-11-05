@@ -1,0 +1,121 @@
+* {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+body {
+    min-height: 100vh;
+}
+
+/* -- a태그 속성 초기화 -- */
+a:visited, a:link, a:hover {
+    text-decoration: none;
+    color: black;
+}
+/* -- 헤더 부분 -- */
+.navbar.is-fixed-top {
+    top: 0;
+}
+.navbar.is-fixed-top {
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: 30;
+}
+.navbar.is-white {
+    background-color: #fff;
+    color: #0a0a0a;
+}
+.navbar-brand{
+    display: inline-block;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 5em;
+    margin:auto;
+    cursor:pointer;
+    color: #85AF4B;
+}
+/* -- 유저정보, 버튼 -- */
+.userInfo{
+    display: inline-block;
+    float: right;
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+
+.logoutButton {
+    font-weight: bold;
+}
+
+/* -- 타이틀 박스 부분*/
+.titleBox {
+    width: 80%;
+    border: 5px solid #85AF4B;
+    border-radius: 30px;
+    vertical-align: middle;
+    margin: 7em auto;
+    padding: 40px 0px;
+}
+.titleText {
+    text-align: center;
+}
+.titleText01 {
+    font-size: 2em;
+}
+.titleText02 {
+    font-size: 3em;
+}
+.titleText03 {
+    font-size: 3em;
+    font-weight: bold;
+}
+/* -- 검색박스 부분 --*/
+.search-box {
+    margin: auto;
+    width: 50%;
+    margin-bottom: 100px;
+}
+/* -- 컨텐츠 박스 부분 --*/
+.contentBox {
+    width: 80%;
+    margin:  auto;
+    display: block;
+}
+.restCard {
+    width: 18.750em;
+margin: 7px;
+    display: inline-block;
+}
+.restInfoCard{
+    min-width: 40.625em;
+}
+.restCardWrap {
+    width: 50%;
+    display: flex;
+}
+/* -- 컨텐츠 restInfo 부분 --*/
+#img-name {
+    width: 18.750em;
+    height: 18.750em;
+    object-fit: cover;
+}
+.restName{
+    font-size: 2em;
+    font-weight: bold;
+}
+.restStar, .restCall{
+    margin-top: 0.4em;
+    font-size: 1em;
+}
+.restStar > span {
+    color: #85AF4B;
+    font-weight: bold;
+}
+.restAddress {
+    height: 4em;
+    font-size: 1em;
+}
+.detailView{
+    float: right;
+}

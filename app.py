@@ -7,12 +7,14 @@ from urllib import parse
 import jwt
 import requests
 from bs4 import BeautifulSoup
+from bson import ObjectId
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 # db 연결
 from pymongo import MongoClient
 from selenium import webdriver
 
-client = MongoClient('mongodb://test:test@localhost', 27017)
+client = MongoClient('52.79.236.197', 27017, username="test", password="test")
+# client = MongoClient('mongodb://test:test@localhost', 27017)
 db = client.miniproject
 
 app = Flask(__name__)
@@ -101,12 +103,6 @@ def main():
     return render_template("main.html")
 
 
-@app.route('/vegan/delReview')
-def delReview():
-    # 리뷰작성페이지에서 본인이 작성한 리뷰 삭제시 상세페이지로 이동
-    return render_template("detailView.html")
-
-
 # 네이버 크롤링 ----------------------------------------------------
 @app.route('/search', methods=['GET'])
 def keyword():
@@ -141,7 +137,7 @@ def keyword():
         print(rest_name, rest_tag, call, rest_url)
 
         # 이미지,주소 크롤링의 경우 다른 곳에 있어서 2차 크롤링 시작(주소인 newUrlImg 참고)
-        chrome_options=webdriver.ChromeOptions()
+        chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
@@ -205,6 +201,7 @@ def keyword():
     return jsonify({'rest_lists': rest_list})
 
 
+# 상세페이지 열기
 @app.route('/detailView')
 def detail():
     token_receive = request.cookies.get('mytoken')
@@ -218,18 +215,21 @@ def detail():
         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
 
+# 리뷰작성
 @app.route('/posting', methods=['POST'])
-def review():
+def posting():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.users.find_one({"username": payload["id"]})
+        rest = request.form['rest']
         comment = request.form['comment']
-        # date = request.form['date']
+        date = request.form['date']
         doc = {
+            "rest": rest,
             "username": user_info["username"],
             "comment": comment,
-            # "date": date
+            "date": date
         }
         db.review.insert_one(doc)
         return jsonify({"result": "success", "msg": "리뷰작성완료"})
@@ -239,7 +239,7 @@ def review():
         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
 
-# 리뷰 리스트 가져오기 (최근 10개)
+# 리뷰 리스트 가져오기
 @app.route("/get_posts", methods=['GET'])
 def get_posts():
     token_receive = request.cookies.get('mytoken')
@@ -249,9 +249,38 @@ def get_posts():
         posts = list(db.review.find({}).sort("date", -1).limit(10))
         for post in posts:
             post["_id"] = str(post["_id"])
-        return jsonify({"result": " success", "msg": "리뷰를 로드 완료했습니다", "posts": post})
+        return jsonify({"result": "success", "msg": "리뷰를 로드 완료했습니다", "posts": posts})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return render_template("detailView.html")
+        return redirect(url_for("detailView"))
+
+
+# 리뷰 삭제
+@app.route("/post/<post_id>", methods=['DELETE'])
+def delete_post(post_id):
+    token_receive = request.cookies.get('mytoken')
+    """Initialize a new ObjectId.
+    An ObjectId is a 12-byte unique identifier consisting of
+    """
+    post = db.review.find_one({'_id': ObjectId(post_id)}, {'_id': False})
+    username = post['username']
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        if post['username'] == payload['id']:
+            db.review.delete_one({'_id': ObjectId(post_id)})
+            return jsonify({
+                'result': 'success',
+                'msg': '삭제되었습니다.',
+                'username': username
+            }), 200
+        else:
+            return jsonify({
+                'result': 'failure',
+                'msg': '본인의 포스팅만 삭제가 가능합니다.'
+            }), 403
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
 
 if __name__ == '__main__':

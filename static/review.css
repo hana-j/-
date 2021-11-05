@@ -7,17 +7,25 @@ body {
     padding-top: 5rem;
 }
 /*해더부분*/
-.logo {
-    font-weight: bold;
-    font-size: 60px;
-    margin: 30px auto 0px auto;
+
+.navbar-brand{
+    display: inline-block;
 }
 
-.userInfo {
+.logo {
+    font-weight: bold;
+    font-size: 5em;
+    margin:auto;
+    cursor:pointer;
+    color: #85AF4B;
+}
+.userInfo{
+    display: inline-block;
     float: right;
-    font-size: 20px;
+    font-size: 1.25em;
     font-weight: bold;
 }
+
 
 .logoutButton {
     font-weight: bold;
@@ -33,45 +41,49 @@ body {
     font-size: 30px;
 }
 
-.restInfo {
-    width: 800px;
-    display: flex;
+/* -- 컨텐츠 restInfo 부분 --*/
+#img-name {
+    width: 18.750em;
+    height: 18.750em;
+    object-fit: cover;
 }
 
-.contentBox {
-    width: 1200px;
-    height: 700px;
-    margin: 100px auto 0px auto;
-}
-
-.contentBox > img {
-    margin: 10px 0px 30px 0px;
-}
-
-.contentBox > h3 {
-    font-size: 60px;
+.restName {
+    font-size: 2em;
     font-weight: bold;
 }
 
-.contentBox > h3 > span {
-    margin-left: 30px;
+.restStar, .restCall {
+    margin-top: 0.4em;
+    font-size: 1em;
 }
 
-.contentBox > .restInfo > p {
-    font-size: 30px;
-    margin-top: 30px;
+.restStar > span {
+    color: #85AF4B;
+    font-weight: bold;
 }
 
-.contentBox > .restInfo > .restInfoTitle {
-    width: 200px;
-    font-size: 30px;
+.restAddress {
+    height: 4em;
+    font-size: 1em;
 }
 
-.contentBox > .restInfo > .restInfoContent {
-    width: 1050px;
-    font-size: 30px;
+.detailView {
+    float: right;
 }
 
+/*=============================*/
+.restInfoWrap {
+    width: 50%;
+    margin: 5em auto 0em auto;
+}
+.restInfoWrap > p {
+    font-weight: bold;
+}
+.restInfoWrap > h1 > span {
+    color: #85AF4B;
+    font-weight: bold;
+}
 
 .restReview {
     width: 1200px;
@@ -114,19 +126,19 @@ body {
 }
 
 .is-sparta {
-    color: #e8344e !important;
+    color: #0A6E0A !important;
 }
 
 .button.is-sparta {
-    background-color: #e8344e;
+    background-color: #85AF4B;
     border-color: transparent;
     color: #fff !important;
 }
 
 .button.is-sparta.is-outlined {
     background-color: transparent;
-    border-color: #e8344e;
-    color: #e8344e !important;
+    border-color: #85AF4B;
+    color: #85AF4B !important;
 }
 
 .modal-content {
